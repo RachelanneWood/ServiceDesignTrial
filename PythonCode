@@ -1,0 +1,88 @@
+import sqlite3
+
+# ----------------------------------
+# 1. Connect to (or create) the database
+# ----------------------------------
+connection = sqlite3.connect("service_design.db")
+cursor = connection.cursor()
+
+# ----------------------------------
+# 2. Create a table for service design methods
+# ----------------------------------
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS service_design_methods (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    method_name TEXT NOT NULL,
+    phase TEXT NOT NULL,
+    description TEXT
+);
+""")
+
+# ----------------------------------
+# 3. Insert sample data
+# ----------------------------------
+# Double Diamond Phases: "Discovery", "Define", "Development", "Delivery", "Evaluate"
+
+methods_data = [
+    ("Empathy Map", "Discovery", 
+     "Helps teams understand user feelings, needs, and pain points."),
+    ("Stakeholder Map", "Discovery", 
+     "Identifies and visualizes all relevant stakeholders and relationships."),
+    ("How Might We Statements", "Define", 
+     "Reframes insights into actionable design challenges."),
+    ("Service Blueprint", "Development", 
+     "Maps out the service process, frontstage and backstage interactions."),
+    ("Prototyping", "Development", 
+     "Creates low- to high-fidelity models of potential solutions."),
+    ("Pilot Testing", "Delivery", 
+     "Implements a small-scale version of the service to gather feedback."),
+    ("Launch Strategy", "Delivery", 
+     "Plans the full rollout, including communications and logistics."),
+    ("Retrospective", "Evaluate", 
+     "Reviews what worked, what didn’t, and opportunities for improvement."),
+    ("Impact Assessment", "Evaluate", 
+     "Measures outcomes against objectives to refine future iterations.")
+]
+
+# Insert sample rows
+cursor.executemany("""
+INSERT INTO service_design_methods (method_name, phase, description)
+VALUES (?, ?, ?);
+""", methods_data)
+
+connection.commit()
+
+# ----------------------------------
+# 4. Example: Querying the database
+# ----------------------------------
+# a) Retrieve all methods for a specific phase
+search_phase = "Discovery"
+cursor.execute("""
+SELECT method_name, description
+FROM service_design_methods
+WHERE phase = ?;
+""", (search_phase,))
+rows = cursor.fetchall()
+
+print(f"Methods in the '{search_phase}' phase:")
+for row in rows:
+    method_name, description = row
+    print(f" - {method_name}: {description}")
+
+# b) Retrieve all methods, grouped by phase
+cursor.execute("""
+SELECT phase, method_name, description
+FROM service_design_methods
+ORDER BY phase;
+""")
+rows = cursor.fetchall()
+
+print("\nAll methods by phase:")
+for row in rows:
+    phase, method_name, description = row
+    print(f"[{phase}] {method_name}: {description}")
+
+# ----------------------------------
+# 5. Close the connection
+# ----------------------------------
+connection.close()
