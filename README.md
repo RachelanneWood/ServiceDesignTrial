@@ -1,22 +1,25 @@
 # ServiceDesignTrial
 A Service Design Trial by Rachel A.Wood
-# Sample data frame with service design tools and their phases
-tools <- data.frame(
-  tool = c("Customer Journey Mapping", "Prototyping", "Stakeholder Interviews", "User Testing"),
-  phase = c("Develop", "Deliver", "Discover", "Define"),
-  stringsAsFactors = FALSE
-)
 
-# Print original data frame
-print("Original Data:")
-print(tools)
 
-# Convert 'phase' column to an ordered factor based on the Double Diamond phases
-tools$phase <- factor(tools$phase, levels = c("Discover", "Define", "Develop", "Deliver"))
+Phython Code file:
+How It Works
+1. Database Connection:
+• Creates or connects to a local SQLite database file named service_design.db.
+2. Table Creation:
+• Sets up a table service_design_methods with columns for an auto-incrementing id, the method_name, its associated phase, and a short description.
+3. Data Insertion:
+• Demonstrates how to insert example rows covering each Double Diamond phase:
+• Discovery – Methods for user research and stakeholder analysis
+• Define – Methods for framing and prioritizing insights
+• Development – Methods for prototyping and refining solutions
+• Delivery – Methods for implementing and launching solutions
+• Evaluate – Methods for assessing impact and learning
+4. Queries:
+• Shows how to retrieve methods associated with a single phase (e.g., “Discovery”) and how to list all methods grouped by phase.
+5. Customization:
+• Add more columns (e.g., recommended duration, team roles, complexity) if needed.
+• Use additional tables or foreign keys if you want to link each method to resources, templates, or deeper documentation.
 
-# Sort the data frame by the 'phase' column
-tools_sorted <- tools[order(tools$phase), ]
+This structure provides a simple but extensible foundation for a service design “toolbox” aligned with the Double Diamond process. You can build upon it to include more sophisticated features such as user authentication, version control for methods, or web-based interfaces for easier data entry and retrieval.
 
-# Print the sorted data frame
-print("Sorted Data by Double Diamond Phases:")
-print(tools_sorted)
