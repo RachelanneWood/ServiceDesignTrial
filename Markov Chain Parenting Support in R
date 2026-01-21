@@ -1,0 +1,113 @@
+############################################################
+# MARKOV CHAIN – PUBLIC SERVICE ENGAGEMENT (WORKED EXAMPLE)
+# Context: Parenting support service (public sector)
+# Time step: Monthly
+############################################################
+
+# ---------------------------
+# 1. Define states
+# ---------------------------
+states <- c(
+  "Not_engaged",
+  "Initial_engagement",
+  "Regular_participation",
+  "Paused_disrupted",
+  "Completed"
+)
+
+# ---------------------------
+# 2. Define transition matrix
+# Rows = current state
+# Columns = next state
+# Each row must sum to 1
+# ---------------------------
+transition_matrix <- matrix(
+  c(
+    # To:  NotEng  Initial  Regular  Paused  Completed
+       0.70,   0.25,    0.00,    0.05,    0.00,   # From Not engaged
+       0.05,   0.15,    0.50,    0.30,    0.00,   # From Initial engagement
+       0.00,   0.00,    0.60,    0.15,    0.25,   # From Regular participation
+       0.10,   0.30,    0.25,    0.35,    0.00,   # From Paused / disrupted
+       0.00,   0.00,    0.00,    0.00,    1.00    # From Completed (absorbing)
+  ),
+  nrow = length(states),
+  byrow = TRUE,
+  dimnames = list(states, states)
+)
+
+# Optional check
+rowSums(transition_matrix)
+
+# ---------------------------
+# 3. Define starting distribution
+# (Entire cohort starts not yet engaged)
+# ---------------------------
+start_state <- c(
+  Not_engaged = 1,
+  Initial_engagement = 0,
+  Regular_participation = 0,
+  Paused_disrupted = 0,
+  Completed = 0
+)
+
+# ---------------------------
+# 4. Run the Markov chain
+# ---------------------------
+steps <- 12  # e.g. 12 months
+
+results <- matrix(
+  nrow = steps + 1,
+  ncol = length(states),
+  dimnames = list(0:steps, states)
+)
+
+results[1, ] <- start_state
+
+for (t in 1:steps) {
+  results[t + 1, ] <- results[t, ] %*% transition_matrix
+}
+
+# ---------------------------
+# 5. Convert to tidy format
+# ---------------------------
+results_df <- as.data.frame(results)
+results_df$Time <- 0:steps
+
+results_long <- reshape(
+  results_df,
+  varying = states,
+  v.names = "Proportion",
+  timevar = "State",
+  times = states,
+  direction = "long"
+)
+
+# ---------------------------
+# 6. Plot results (base R)
+# ---------------------------
+matplot(
+  0:steps,
+  results,
+  type = "l",
+  lty = 1,
+  lwd = 2,
+  xlab = "Time (months)",
+  ylab = "Proportion of cohort",
+  main = "Markov Chain: Engagement with Parenting Support Service"
+)
+
+legend(
+  "right",
+  legend = states,
+  col = 1:length(states),
+  lty = 1,
+  lwd = 2,
+  bty = "n"
+)
+
+# ---------------------------
+# 7. View outputs
+# ---------------------------
+print(transition_matrix)
+print(round(results, 3))
+head(results_long)
